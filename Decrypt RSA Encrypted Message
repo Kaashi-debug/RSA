@@ -1,0 +1,10 @@
+from Crypto.Util.number import long_to_bytes
+
+# Known values
+n = 279365489789079962135243  # Replace with your modulus
+d = 202133317541416101131297  # Replace with your private key
+c = 123456789  # Replace with your ciphertext
+
+# Decrypt the ciphertext
+m = pow(c, d, n)
+print(f"Decrypted message: {long_to_bytes(m)}")
