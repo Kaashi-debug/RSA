@@ -1,0 +1,17 @@
+from Crypto.Util.number import inverse
+
+# Known values
+n = 279365489789079962135243  # Replace with your modulus
+e = 65537  # Typically the public exponent
+
+# Factors of n
+p = 129807421463370683507503
+q = 2152302898747
+
+# Calculate phi
+phi = (p - 1) * (q - 1)
+
+# Calculate private key d
+d = inverse(e, phi)
+
+print(f"Private key (d): {d}")
