@@ -1,0 +1,25 @@
+from sympy import mod_inverse
+from Crypto.Util.number import long_to_bytes
+
+# Known values
+n1, n2, n3 = 101, 103, 107  # Replace with your moduli
+c1, c2, c3 = 56, 78, 94  # Replace with your ciphertexts
+e = 3  # Public exponent
+
+# Product of all moduli
+N = n1 * n2 * n3
+
+# Calculate CRT components
+m1, m2, m3 = N // n1, N // n2, N // n3
+inv1, inv2, inv3 = mod_inverse(m1, n1), mod_inverse(m2, n2), mod_inverse(m3, n3)
+
+# Combine to get the message
+C = (c1 * m1 * inv1 + c2 * m2 * inv2 + c3 * m3 * inv3) % N
+
+# Cube root
+m, exact = iroot(C, e)
+
+if exact:
+    print(f"Decrypted message: {long_to_bytes(m)}")
+else:
+    print("Failed to recover the plaintext directly.")
