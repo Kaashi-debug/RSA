@@ -1,0 +1,13 @@
+from gmpy2 import iroot
+
+# Known values
+c = 123456789  # Replace with your ciphertext
+e = 3  # Public exponent
+
+# Cube root of the ciphertext
+m, exact = iroot(c, e)
+
+if exact:
+    print(f"Decrypted message: {bytes.fromhex(hex(m)[2:]).decode()}")
+else:
+    print("Failed to recover the plaintext directly.")
