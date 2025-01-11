@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+from Crypto.Util.number import *
+from sympy import *
+from gmpy2 import *
+import math
+import requests
+
+def gcd_extended(a, b):
+    if a == 0:
+        return b, 0, 1
+    gcd, x1, y1 = gcd_extended(b % a, a)
+    x = y1 - (b // a) * x1
+    y = x1
+    return gcd, x, y
+
+def rsa_decrypt(c, d, n):
+    return pow(c, d, n)
+
+def find_private_key(e, p, q):
+    phi = (p - 1) * (q - 1)
+    d = pow(e, -1, phi)  # Modular inverse
+    return d
+
+def factorize_n(n):
+    log.info("Attempting to factorize n...")
+    p, q = None, None
+
+    # Method 1: Using small primes
+    for prime in primerange(2, 10**6):
+        if n % prime == 0:
+            p = prime
+            q = n // prime
+            break
+
+    # Method 2: Fermat's factorization
+    if p is None:
+        log.info("Trying Fermat's factorization...")
+        a = isqrt(n) + 1
+        b2 = a * a - n
+        while not is_square(b2):
+            a += 1
+            b2 = a * a - n
+        b = isqrt(b2)
+        p = a - b
+        q = a + b
+
+    if p and q:
+        log.success(f"Factors found: p = {p}, q = {q}")
+    else:
+        log.error("Failed to factorize n.")
+    return p, q
+
+def solve_rsa(n, e, c):
+    # Try to factorize n
+    p, q = factorize_n(n)
+    if not p or not q:
+        log.error("Cannot continue without factorizing n.")
+        return None
+
+    # Find private key
+    d = find_private_key(e, p, q)
+    log.success(f"Private key (d): {d}")
+
+    # Decrypt ciphertext
+    m = rsa_decrypt(c, d, n)
+    flag = long_to_bytes(m).decode(errors="ignore")
+    log.success(f"Decrypted flag: {flag}")
+    return flag
+
+def handle_common_rsa_cases():
+    # Example RSA values; replace these with actual challenge values
+    n = 704217665443792079
+    e = 65537
+    c = 598148016441153
+
+    return solve_rsa(n, e, c)
+
+if __name__ == "__main__":
+    from pwn import *
+    log.info("Starting RSA flag finder...")
+    flag = handle_common_rsa_cases()
+    if flag:
+        log.success(f"Flag: {flag}")
+    else:
+        log.error("Failed to find the flag.")
